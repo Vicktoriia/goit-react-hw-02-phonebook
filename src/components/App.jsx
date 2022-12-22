@@ -4,7 +4,6 @@ import Section from './Section/Section';
 import ContactForm from './ContactForm/ContactForm';
 import Filter from './Filter/Filter';
 import ContactList from './ContactList/ContactList';
-import Notification from './Notification/Notification';
 
 class App extends Component {
   state = {
@@ -17,7 +16,7 @@ class App extends Component {
     filter: '',
   };
 
-  formSubmit = (name, number) => {
+  formSubmit = ({ name, number }) => {
     const contact = {
       id: nanoid(),
       name,
@@ -34,12 +33,11 @@ class App extends Component {
   };
 
   getVisibleContacts = () => {
-    const { filter, contacts } = this.state;
-    const validateFilter = filter.toLowerCase();
-
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(validateFilter)
-    );
+    const { contacts, filter } = this.state;
+    const validateFilter = contacts.filter(contact => {
+      return contact.name.toLowerCase().includes(filter.toLowerCase());
+    });
+    return validateFilter;
   };
 
   changeFilter = e => {
@@ -53,10 +51,7 @@ class App extends Component {
     }));
   };
 
-  render = () => {
-    const { filter, contacts } = this.state;
-    const visibleContacts = this.getVisibleContacts();
-
+  render() {
     return (
       <div
         style={{
@@ -70,24 +65,16 @@ class App extends Component {
         <Section title="Phonebook">
           <ContactForm onSubmit={this.formSubmit} />
         </Section>
-
         <Section title="Contacts">
-          {contacts.length > 0 && (
-            <Filter value={filter} onChange={this.changeFilter} />
-          )}
-
-          {visibleContacts.length > 0 ? (
-            <ContactList
-              contacts={visibleContacts}
-              onDelete={this.deleteContact}
-            />
-          ) : (
-            <Notification message="There is no contacts" />
-          )}
+          <Filter value={this.state.filter} onChange={this.changeFilter} />
+          <ContactList
+            contacts={this.getVisibleContacts()}
+            onDelete={this.deleteContact}
+          />
         </Section>
       </div>
     );
-  };
+  }
 }
 
 export default App;
