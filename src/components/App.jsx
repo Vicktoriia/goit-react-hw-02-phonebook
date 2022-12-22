@@ -24,35 +24,13 @@ class App extends Component {
       number,
     };
 
-    if (!this.validateContact(contact)) {
-      alert(`${name} is already in contacts.`);
-      return false;
+    if (this.state.contacts.some(e => e.name === name)) {
+      return alert(`${name} is already in contacts!`);
     }
 
     this.setState(({ contacts }) => ({
       contacts: [contact, ...contacts],
     }));
-
-    return contact.id;
-  };
-
-  validateContact = ({ name }) => {
-    const { contacts } = this.state;
-    const validateName = name.toLowerCase();
-
-    return !contacts.some(({ name }) =>
-      name.toLowerCase().includes(validateName)
-    );
-  };
-
-  deleteContact = contactId => {
-    this.setState(({ contacts }) => ({
-      contacts: contacts.filter(({ id }) => id !== contactId),
-    }));
-  };
-
-  changeFilter = e => {
-    this.setState({ filter: e.currentTarget.value });
   };
 
   getVisibleContacts = () => {
@@ -62,6 +40,17 @@ class App extends Component {
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(validateFilter)
     );
+  };
+
+  changeFilter = e => {
+    const { name, value } = e.target;
+    this.setState({ [name]: value });
+  };
+
+  deleteContact = contactId => {
+    this.setState(prevState => ({
+      contacts: prevState.contacts.filter(contact => contact.id !== contactId),
+    }));
   };
 
   render = () => {
